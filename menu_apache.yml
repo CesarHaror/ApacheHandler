@@ -1,32 +1,30 @@
 ---
-- name: Gestion de Apache en CentOS 7
+- name: Gestion de Apache en CentOS7
   hosts: all
-  become: yes  # Para obtener permisos de superusuario
-
+  become: yes
   tasks:
-    - name: Obtener el estado de Apache
-      ansible.builtin.shell: systemctl is-active httpd
-      register: apache_status
+    - name: Menu de seleccion
+      block:
+        - name: Mostrar opciones
+          pause:
+            prompt: "Selecciona una opcion:\n1. Obtener estado de Apache\n2. Detener Apache\n3. Iniciar Apache"
+          register: menu_selection
+          until: menu_selection.user_input in ['1', '2', '3']
+          retries: 3
 
-    - name: Mostrar el estado de Apache
-      ansible.builtin.debug:
-        var: apache_status.stdout
-      when: apache_status.rc == 0
-      changed_when: false
+        - name: Obtener estado de Apache
+          debug:
+            msg: "Obteniendo estado de Apache..."
+          when: menu_selection.user_input == '1'
 
-    - name: Reiniciar Apache
-      ansible.builtin.shell: systemctl restart httpd
-      ignore_errors: yes  # Ignorar errores en caso de que Apache no este en ejecucion
+        - name: Detener Apache
+          service:
+            name: httpd
+            state: stopped
+          when: menu_selection.user_input == '2'
 
-    - name: Detener Apache
-      ansible.builtin.shell: systemctl stop httpd
-      ignore_errors: yes  # Ignorar errores en caso de que Apache no este en ejecucion
-
-    - name: Iniciar Apache
-      ansible.builtin.shell: systemctl start httpd
-
-  handlers:
-    - name: Reiniciar Apache si es necesario
-      ansible.builtin.service:
-        name: httpd
-        state: restarted
+        - name: Iniciar Apache
+          service:
+            name: httpd
+            state: started
+          when: menu_selection.user_input == '3'
