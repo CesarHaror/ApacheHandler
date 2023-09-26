@@ -1,0 +1,32 @@
+---
+- name: Gestion de Apache en CentOS 7
+  hosts: all
+  become: yes  # Para obtener permisos de superusuario
+
+  tasks:
+    - name: Obtener el estado de Apache
+      ansible.builtin.shell: systemctl is-active httpd
+      register: apache_status
+
+    - name: Mostrar el estado de Apache
+      ansible.builtin.debug:
+        var: apache_status.stdout
+      when: apache_status.rc == 0
+      changed_when: false
+
+    - name: Reiniciar Apache
+      ansible.builtin.shell: systemctl restart httpd
+      ignore_errors: yes  # Ignorar errores en caso de que Apache no este en ejecucion
+
+    - name: Detener Apache
+      ansible.builtin.shell: systemctl stop httpd
+      ignore_errors: yes  # Ignorar errores en caso de que Apache no este en ejecucion
+
+    - name: Iniciar Apache
+      ansible.builtin.shell: systemctl start httpd
+
+  handlers:
+    - name: Reiniciar Apache si es necesario
+      ansible.builtin.service:
+        name: httpd
+        state: restarted
