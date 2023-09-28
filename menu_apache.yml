@@ -13,8 +13,12 @@
           retries: 3
 
         - name: Obtener estado de Apache
+          command: systemctl is-active httpd
+          register: apache_status
+
+        - name: Mostrar resultado
           debug:
-            msg: "Obteniendo estado de Apache..."
+            var: apache_status.stdout
           when: menu_selection.user_input == '1'
 
         - name: Detener Apache
