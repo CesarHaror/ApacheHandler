@@ -1,5 +1,5 @@
 ---
-- name: Gestion de Apache en CentOS7
+- name: Gestion de Apache2 en CentOS7
   hosts: all
   become: yes
   tasks:
