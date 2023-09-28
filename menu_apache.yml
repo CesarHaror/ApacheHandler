@@ -7,7 +7,7 @@
       block:
         - name: Mostrar opciones
           pause:
-            prompt: "Selecciona una opcion:\n1. Obtener estado de Apache2\n2. Detener Apache2\n3. Iniciar Apache2\n4. Reinicia Apache2"
+            prompt: "Selecciona una opcion:\n1. Obtener estado de Apache2\n2. Detener Apache2\n3. Iniciar Apache2\n4. Reiniciar Apache2"
           register: menu_selection
           until: menu_selection.user_input in ['1', '2', '3','4']
           retries: 4
@@ -16,7 +16,7 @@
           command: systemctl is-active httpd
           register: apache_status
 
-        - name: Mostrar resultado
+        - name: Mostrar Status de Apache2
           debug:
             var: apache_status.stdout
           when: menu_selection.user_input == '1'
